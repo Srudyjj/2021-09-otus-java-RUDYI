@@ -3,6 +3,9 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
 repositories {
     mavenCentral()
 }
@@ -11,12 +14,8 @@ dependencies {
     implementation 'com.google.guava:guava:31.0.1-jre'
 }
 
-test {
-    useJUnitPlatform()
-}
-
 shadowJar {
-    archiveBaseName.set('gradleHelloOtus')
+    archiveBaseName.set('hw01-gradle')
     archiveVersion.set('0.1')
     archiveClassifier.set('')
     manifest {
