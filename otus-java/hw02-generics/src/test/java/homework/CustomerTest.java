@@ -56,7 +56,6 @@ class CustomerTest {
     }
 
     @Test
-    @Disabled //надо удалить
     @DisplayName("Сортировка по полю score, итерация по возрастанию")
     void scoreSortingTest() {
         //given
@@ -96,7 +95,6 @@ class CustomerTest {
     }
 
     @Test
-    @Disabled //надо удалить
     @DisplayName("Модификация коллекции")
     void mutationTest() {
         //given

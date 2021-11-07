@@ -1,23 +1,40 @@
 package homework;
 
 
+import java.util.AbstractMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CustomerService {
 
-    //todo: 3. надо реализовать методы этого класса
-    //важно подобрать подходящую Map-у, посмотрите на редко используемые методы, они тут полезны
+    private final TreeMap<Customer, String> storage =  new TreeMap<>();
 
     public Map.Entry<Customer, String> getSmallest() {
-        //Возможно, чтобы реализовать этот метод, потребуется посмотреть как Map.Entry сделан в jdk
-        return null; // это "заглушка, чтобы скомилировать"
+        Map.Entry<Customer, String> entry = storage.firstEntry();
+        if (entry == null) {
+            return null;
+        }
+        return cloneEntry(entry);
     }
 
     public Map.Entry<Customer, String> getNext(Customer customer) {
-        return null; // это "заглушка, чтобы скомилировать"
+        Map.Entry<Customer, String> entry = storage.higherEntry(customer);
+        if (entry == null) {
+            return null;
+        }
+        return cloneEntry(entry);
     }
 
     public void add(Customer customer, String data) {
+        storage.put(customer, data);
+    }
 
+    private static Map.Entry<Customer, String> cloneEntry(Map.Entry<Customer, String> entry) {
+        var customer = new Customer(
+                entry.getKey().getId(),
+                entry.getKey().getName(),
+                entry.getKey().getScores());
+        var value = entry.getValue();
+        return new AbstractMap.SimpleEntry<>(customer, value);
     }
 }
