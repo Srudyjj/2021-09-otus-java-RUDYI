@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 public class CustomerService {
 
-    private final TreeMap<Customer, String> storage =  new TreeMap<>();
+    private final TreeMap<Customer, String> storage = new TreeMap<>();
 
     public Map.Entry<Customer, String> getSmallest() {
         Map.Entry<Customer, String> entry = storage.firstEntry();
