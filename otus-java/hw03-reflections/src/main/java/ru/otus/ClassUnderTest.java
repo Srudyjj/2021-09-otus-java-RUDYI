@@ -23,7 +23,7 @@ public class ClassUnderTest {
 
     @Test
     public void second() {
-        System.out.println("Second method");
+        throw new RuntimeException("My exception");
     }
 
     @Test
