@@ -15,17 +15,23 @@ public final class Runner {
         TestingResult result = new TestingResult(testingContext.getTotalTests());
         for (Method test : testingContext.getTestList()) {
             try {
-                executeBefore(object, testingContext.getBeforeList());
-                test.invoke(object);
+                executeTest(object, test, testingContext);
                 Logger.logPassed(test.getName());
                 result.addPassed();
             } catch (Exception e) {
                 Logger.logFailed(test.getName());
-            } finally {
-                executeAfter(object, testingContext.getAfterList());
             }
         }
         Logger.logResult(result);
+    }
+
+    private static void executeTest(Object object, Method test, TestingContext testingContext) throws Exception {
+        try {
+            executeBefore(object, testingContext.getBeforeList());
+            test.invoke(object);
+        } finally {
+            executeAfter(object, testingContext.getAfterList());
+        }
     }
 
     private static void executeBefore(Object object, List<Method> beforeList) throws Exception {
