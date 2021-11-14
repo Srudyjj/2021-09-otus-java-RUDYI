@@ -5,76 +5,59 @@ import ru.otus.annotations.Before;
 import ru.otus.annotations.Test;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
-public final class Runner<T> {
+public final class Runner {
 
-    private final List<Method> beforeList = new ArrayList<>();
-    private final List<Method> afterList = new ArrayList<>();
-    private final List<Method> testList = new ArrayList<>();
-
-    private final Class<T> classUnderTest;
-
-    private Runner(Class<T> classUnderTest) {
-        this.classUnderTest = classUnderTest;
-    }
-
-    public static void run(Class<?> clazz) throws Exception {
-        var runner = new Runner<>(clazz);
-        runner.execute();
-    }
-
-    private void execute() throws Exception {
-        int passed = 0;
-        int failed = 0;
-        prepareMethods();
-        T object = createObject();
-        for (Method test: testList){
+    public static void run(Class<?> classUnderTest) throws Exception {
+        TestingContext testingContext = prepareMethods(classUnderTest);
+        Object object = createObject(classUnderTest);
+        TestingResult result = new TestingResult(testingContext.getTotalTests());
+        for (Method test : testingContext.getTestList()) {
             try {
-                executeBefore(object);
+                executeBefore(object, testingContext.getBeforeList());
                 test.invoke(object);
-                executeAfter(object);
-
-                System.out.println(String.format("%s(): Passed", test.getName()));
-                passed++;
+                Logger.logPassed(test.getName());
+                result.addPassed();
             } catch (Exception e) {
-                System.out.println(String.format("%s(): Failed", test.getName()));
-                failed++;
+                Logger.logFailed(test.getName());
+            } finally {
+                executeAfter(object, testingContext.getAfterList());
             }
         }
-        System.out.println(String.format("Total: %d test(s)", testList.size()));
-        System.out.println(String.format("Passed: %d\nFailed: %d", passed, failed));
+        Logger.logResult(result);
     }
 
-    private void executeBefore(T object) throws Exception {
-        for (Method method: beforeList){
+    private static void executeBefore(Object object, List<Method> beforeList) throws Exception {
+        for (Method method : beforeList) {
             method.invoke(object);
         }
     }
 
-    private void executeAfter(T object) throws Exception {
-        for (Method method: afterList){
+    private static void executeAfter(Object object, List<Method> afterList) throws Exception {
+        for (Method method : afterList) {
             method.invoke(object);
         }
     }
 
-    private void prepareMethods() {
+    private static TestingContext prepareMethods(Class<?> classUnderTest) {
         Method[] methods = classUnderTest.getDeclaredMethods();
+        TestingContext context = new TestingContext();
         for (Method method : methods) {
             if (method.isAnnotationPresent(Before.class)) {
-                beforeList.add(method);
+                context.addBefore(method);
             }
             if (method.isAnnotationPresent(After.class)) {
-                afterList.add(method);
+                context.addAfter(method);
             }
             if (method.isAnnotationPresent(Test.class)) {
-                testList.add(method);
+                context.addTest(method);
             }
         }
+        return context;
     }
 
-    private T createObject() throws Exception {
-        return classUnderTest.getConstructor().newInstance();
+    private static Object createObject(Class<?> clazz) throws Exception {
+        return clazz.getConstructor().newInstance();
     }
 }
