@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+shadowJar {
+    archiveBaseName.set('hw04-gc-test-utility')
+    archiveVersion.set('')
+    archiveClassifier.set('')
+    manifest {
+        attributes 'Main-Class': 'ru.otus.CalcDemo'
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar
