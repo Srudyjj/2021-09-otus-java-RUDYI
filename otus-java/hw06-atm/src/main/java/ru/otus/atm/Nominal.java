@@ -10,7 +10,7 @@ public enum Nominal {
     FIFTY(50),
     HUNGERED(100);
 
-    private final int value;
+    private int value;
 
     Nominal(int value) {
         this.value = value;
