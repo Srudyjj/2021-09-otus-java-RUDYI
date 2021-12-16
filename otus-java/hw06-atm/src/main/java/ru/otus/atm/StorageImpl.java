@@ -58,6 +58,13 @@ public class StorageImpl implements Storage {
         return res;
     }
 
+    @Override
+    public int getSumOfRest() {
+        return storage.entrySet().stream()
+                .mapToInt(e -> e.getKey().getValue() * e.getValue().size())
+                .sum();
+    }
+
     private static Map<Nominal, CurrencyCell> getStorageCopy(Map<Nominal, CurrencyCell> storage) {
         return storage
                 .entrySet()

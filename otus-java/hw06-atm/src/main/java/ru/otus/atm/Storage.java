@@ -6,4 +6,6 @@ public interface Storage {
     void add(Banknote banknote, int value);
 
     List<Banknote> withdraw(int value);
+
+    int getSumOfRest();
 }

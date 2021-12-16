@@ -33,14 +33,49 @@ class StorageImplTest {
         storage.add(new Banknote(Nominal.TWENTY), 2);
         int value = 60;
 
-        assertThrows(RuntimeException.class, () -> {
-            List<Banknote> res = storage.withdraw(value);
-        });
+        assertThrows(RuntimeException.class, () -> storage.withdraw(value));
 
         StorageImpl storageCopy = new StorageImpl();
         storageCopy.add(new Banknote(Nominal.FIFTY), 2);
         storageCopy.add(new Banknote(Nominal.TWENTY), 2);
 
         assertEquals(storage, storageCopy);
+    }
+
+    @Test
+    void sum(){
+        StorageImpl storage = new StorageImpl();
+        storage.add(new Banknote(Nominal.FIFTY), 2);
+        storage.add(new Banknote(Nominal.TWENTY), 2);
+
+        var expected = 140;
+        var actual = storage.getSumOfRest();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void sumAfterWithdraw(){
+        StorageImpl storage = new StorageImpl();
+        storage.add(new Banknote(Nominal.FIFTY), 2);
+        storage.add(new Banknote(Nominal.TWENTY), 2);
+
+        var expected = 0;
+        storage.withdraw(140);
+        var actual = storage.getSumOfRest();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void sumAfterErrorWithdraw(){
+        StorageImpl storage = new StorageImpl();
+        storage.add(new Banknote(Nominal.FIFTY), 2);
+        storage.add(new Banknote(Nominal.TWENTY), 2);
+
+        var expected = 140;
+        assertThrows(RuntimeException.class, () -> {
+            storage.withdraw(240);
+        });
+        var actual = storage.getSumOfRest();
+        assertEquals(expected, actual);
     }
 }

@@ -11,9 +11,20 @@ public class CashMachine {
 
     public void add(Banknote banknote, int value) {
         storage.add(banknote, value);
+        System.out.println("The money added");
+        System.out.println();
     }
 
-    public List<Banknote> get(int value) {
-        return storage.withdraw(value);
+    public void get(int value) {
+        List<Banknote> banknotes = storage.withdraw(value);
+        System.out.println("Get your money:");
+        banknotes.forEach(System.out::println);
+        System.out.println();
+    }
+
+    public void balance() {
+        int sumOfRest = storage.getSumOfRest();
+        System.out.println("Balance is: " + sumOfRest);
+        System.out.println();
     }
 }
