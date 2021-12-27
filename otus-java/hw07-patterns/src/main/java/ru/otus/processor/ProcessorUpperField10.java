@@ -2,6 +2,7 @@ package ru.otus.processor;
 
 import ru.otus.model.Message;
 
+//Decorator
 public class ProcessorUpperField10 implements Processor {
 
     @Override

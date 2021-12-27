@@ -2,6 +2,7 @@ package ru.otus.processor;
 
 import ru.otus.model.Message;
 
+//Proxy
 public class LoggerProcessor implements Processor {
 
 
