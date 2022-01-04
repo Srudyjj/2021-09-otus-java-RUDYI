@@ -2,8 +2,6 @@ package ru.otus.processor;
 
 import ru.otus.model.Message;
 
-import java.time.LocalTime;
-
 public class ProcessorThrowException implements Processor {
 
     private final TimeProvider timeProvider;
@@ -14,13 +12,16 @@ public class ProcessorThrowException implements Processor {
 
     @Override
     public Message process(Message message) {
-        long startTime = System.nanoTime();
-        LocalTime futureTime = timeProvider.getTime().plusSeconds(4);
-        while (!futureTime.isBefore(timeProvider.getTime())){
-            continue;
+        int startTime = timeProvider.getTime().getSecond();
+        int tickTime = timeProvider.getTime().getSecond();
+        while (tickTime - startTime < 4) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            tickTime = timeProvider.getTime().getSecond();
         }
-        long endTime = System.nanoTime();
-        System.out.println((endTime - startTime)/1_000_000);
 
         throw new RuntimeException();
     }
