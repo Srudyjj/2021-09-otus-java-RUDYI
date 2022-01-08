@@ -1,5 +1,16 @@
 package ru.otus;
 
+import ru.otus.handler.ComplexProcessor;
+import ru.otus.listener.ListenerPrinterConsole;
+import ru.otus.listener.homework.HistoryListener;
+import ru.otus.model.Message;
+import ru.otus.model.ObjectForMessage;
+import ru.otus.processor.*;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomeWork {
 
     /*
@@ -20,5 +31,35 @@ public class HomeWork {
            по аналогии с Demo.class
            из элеменов "to do" создать new ComplexProcessor и обработать сообщение
          */
+
+        var processors = List.of(new ProcessorConcatFields(),
+                new LoggerProcessor(new ProcessorUpperField10()),
+                new ProcessorSwapField11Field12(),
+                new ProcessorThrowException(LocalTime::now));
+
+        var complexProcessor = new ComplexProcessor(processors, System.out::println);
+        var listenerPrinter = new ListenerPrinterConsole();
+        var historyListener = new HistoryListener();
+        complexProcessor.addListener(listenerPrinter);
+        complexProcessor.addListener(historyListener);
+
+        var field13 = new ObjectForMessage();
+        var field13Data = new ArrayList<String>();
+        field13Data.add("44");
+        field13.setData(field13Data);
+
+        var message = new Message.Builder(1L)
+                .field1("field1")
+                .field2("field2")
+                .field3("field3")
+                .field6("field6")
+                .field10("field10")
+                .field13(field13)
+                .build();
+
+        var result = complexProcessor.handle(message);
+        System.out.println("result:" + result);
+
+        complexProcessor.removeListener(listenerPrinter);
     }
 }
