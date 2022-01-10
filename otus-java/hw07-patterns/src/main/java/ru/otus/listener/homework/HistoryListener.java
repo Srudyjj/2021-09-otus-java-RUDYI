@@ -16,7 +16,9 @@ public class HistoryListener implements Listener, HistoryReader {
     @Override
     public void onUpdated(Message msg) {
         var field13 = new ObjectForMessage();
-        field13.setData(new ArrayList<>(msg.getField13().getData()));
+        if (msg.getField13() != null) {
+            field13.setData(new ArrayList<>(msg.getField13().getData()));
+        }
 
         Message messageCopy = msg.toBuilder().field13(field13).build();
         history.put(messageCopy.getId(), messageCopy);

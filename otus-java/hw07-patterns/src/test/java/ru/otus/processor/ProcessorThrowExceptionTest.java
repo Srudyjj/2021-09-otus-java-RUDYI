@@ -22,4 +22,15 @@ class ProcessorThrowExceptionTest {
         assertThrows(RuntimeException.class, () -> processor.process(null));
     }
 
+    @Test
+    void testIgnore() {
+        //TimeProvider provider = LocalTime::now;
+        TimeProvider provider = Mockito.mock(TimeProvider.class);
+        when(provider.getTime())
+                .thenReturn(LocalTime.of(1, 2, 3));
+
+        ProcessorThrowException processor = new ProcessorThrowException(provider);
+        processor.process(null);
+    }
+
 }

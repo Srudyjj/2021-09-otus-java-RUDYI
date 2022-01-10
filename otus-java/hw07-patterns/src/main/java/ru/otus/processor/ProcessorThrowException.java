@@ -12,9 +12,9 @@ public class ProcessorThrowException implements Processor {
 
     @Override
     public Message process(Message message) {
-        while (timeProvider.getTime().getSecond() % 2 != 0) {
+        if (timeProvider.getTime().getSecond() % 2 == 0) {
+            throw new RuntimeException();
         }
-
-        throw new RuntimeException();
+        return message;
     }
 }
