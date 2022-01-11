@@ -15,8 +15,9 @@ public class HistoryListener implements Listener, HistoryReader {
 
     @Override
     public void onUpdated(Message msg) {
-        var field13 = new ObjectForMessage();
+        ObjectForMessage field13 = null;
         if (msg.getField13() != null) {
+            field13 = new ObjectForMessage();
             field13.setData(new ArrayList<>(msg.getField13().getData()));
         }
 
