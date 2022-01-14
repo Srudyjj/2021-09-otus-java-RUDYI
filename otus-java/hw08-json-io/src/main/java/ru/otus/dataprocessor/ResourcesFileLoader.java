@@ -11,21 +11,24 @@ import java.util.List;
 
 public class ResourcesFileLoader implements Loader {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final SimpleModule module = new SimpleModule("MeasurementDeserializer",
+            new Version(1,0,0,null, null,null));
+    static {
+        module.addDeserializer(Measurement.class, new MeasurementDeserializer());
+        mapper.registerModule(module);
+    }
+
     private final String fileName;
 
     public ResourcesFileLoader(String fileName) {
         this.fileName = fileName;
-        SimpleModule module =
-                new SimpleModule("MeasurementDeserializer", new Version(1,0,0,null, null,null));
-        module.addDeserializer(Measurement.class, new MeasurementDeserializer());
-        mapper.registerModule(module);
     }
 
     @Override
     public List<Measurement> load() throws IOException {
         var resource = ResourcesFileLoader.class.getClassLoader().getResource(fileName);
-        return mapper.readValue(resource, new TypeReference<List<Measurement>>() {
+        return mapper.readValue(resource, new TypeReference<>() {
         });
     }
 }

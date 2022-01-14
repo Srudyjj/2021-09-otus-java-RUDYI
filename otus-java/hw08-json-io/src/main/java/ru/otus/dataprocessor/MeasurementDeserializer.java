@@ -9,13 +9,13 @@ import ru.otus.model.Measurement;
 
 import java.io.IOException;
 
-public class MeasurementDeserializer extends StdDeserializer<Measurement> {
+public final class MeasurementDeserializer extends StdDeserializer<Measurement> {
 
     public MeasurementDeserializer() {
         this(null);
     }
 
-    protected MeasurementDeserializer(Class<?> vc) {
+    private MeasurementDeserializer(Class<?> vc) {
         super(vc);
     }
 
