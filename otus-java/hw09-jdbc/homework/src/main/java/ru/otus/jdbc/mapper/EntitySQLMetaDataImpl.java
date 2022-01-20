@@ -1,5 +1,6 @@
 package ru.otus.jdbc.mapper;
 
+import java.lang.reflect.Field;
 import java.util.stream.Collectors;
 
 public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
@@ -25,12 +26,19 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
 
     @Override
     public String getInsertSql() {
+        String columns = classMetaData
+                .getFieldsWithoutId()
+                .stream()
+                .map(Field::getName)
+                .collect(Collectors.joining(", "));
+
         String values = classMetaData
-                .getAllFields()
+                .getFieldsWithoutId()
                 .stream()
                 .map(field -> "?")
                 .collect(Collectors.joining(", "));
         String sql = "INSERT INTO " + classMetaData.getName() +
+                " ( " + columns + " ) " +
                 " VALUES ( " + values + " )";
         return sql;
     }

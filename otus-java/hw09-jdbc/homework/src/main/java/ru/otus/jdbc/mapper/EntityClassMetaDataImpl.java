@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
@@ -17,13 +18,13 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     @Override
     public String getName() {
-        return clazz.getName();
+        return clazz.getSimpleName().toLowerCase(Locale.ROOT);
     }
 
     @Override
     public Constructor<T> getConstructor() {
         try {
-            return clazz.getConstructor();
+            return clazz.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -31,7 +32,7 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     @Override
     public Field getIdField() {
-        for (Field field : clazz.getFields()) {
+        for (Field field : clazz.getDeclaredFields()) {
             if(field.isAnnotationPresent(Id.class)) {
                 return field;
             }
@@ -41,12 +42,12 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     @Override
     public List<Field> getAllFields() {
-        return Arrays.asList(clazz.getFields());
+        return Arrays.asList(clazz.getDeclaredFields());
     }
 
     @Override
     public List<Field> getFieldsWithoutId() {
-        return Arrays.asList(clazz.getFields())
+        return Arrays.asList(clazz.getDeclaredFields())
                 .stream()
                 .filter(field -> !field.isAnnotationPresent(Id.class))
                 .toList();
