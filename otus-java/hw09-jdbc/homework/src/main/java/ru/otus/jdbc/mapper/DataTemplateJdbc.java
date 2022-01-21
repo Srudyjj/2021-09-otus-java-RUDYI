@@ -6,6 +6,7 @@ import ru.otus.core.repository.executor.DbExecutor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +32,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 resultSet ->  {
                     try {
                         if(resultSet.next()) {
-                            T instance = getInstance();
-                            Class<?> instanceClass = instance.getClass();
-                            for (Field field : classMetaData.getAllFields()) {
-                                String fieldName = field.getName();
-                                Field declaredField = getField(instanceClass, fieldName);
-                                declaredField.set(instance, resultSet.getObject(fieldName));
-                            }
-                            return instance;
+                            return createInstance(resultSet);
                         }
                         return null;
                     } catch (Exception e) {
@@ -49,7 +43,17 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public List<T> findAll(Connection connection) {
-        throw new UnsupportedOperationException();
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), List.of(), resultSet -> {
+            try {
+                List<T> res = new ArrayList<>();
+                while(resultSet.next()) {
+                    res.add(createInstance(resultSet));
+                }
+                return res;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).orElse(List.of());
     }
 
     @Override
@@ -84,5 +88,16 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         Field declaredField = instanceClass.getDeclaredField(fieldName);
         declaredField.setAccessible(true);
         return declaredField;
+    }
+
+    private T createInstance(ResultSet resultSet) throws Exception {
+        T instance = getInstance();
+        Class<?> instanceClass = instance.getClass();
+        for (Field field : classMetaData.getAllFields()) {
+            String fieldName = field.getName();
+            Field declaredField = getField(instanceClass, fieldName);
+            declaredField.set(instance, resultSet.getObject(fieldName));
+        }
+        return instance;
     }
 }
