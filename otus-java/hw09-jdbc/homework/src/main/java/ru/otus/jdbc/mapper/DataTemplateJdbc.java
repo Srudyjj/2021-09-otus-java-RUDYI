@@ -61,9 +61,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         List<Object> values = new ArrayList<>();
         for (Field field : classMetaData.getFieldsWithoutId()) {
             try {
-                String fieldName = field.getName();
-                Field declaredField = client.getClass().getDeclaredField(fieldName);
-                declaredField.setAccessible(true);
+                Field declaredField = getField(client.getClass(), field.getName());
                 values.add(declaredField.get(client));
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -75,7 +73,18 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public void update(Connection connection, T client) {
-        throw new UnsupportedOperationException();
+        List<Object> values = new ArrayList<>();
+        try {
+            for (Field field : classMetaData.getFieldsWithoutId()) {
+                    Field declaredField = getField(client.getClass(), field.getName());
+                    values.add(declaredField.get(client));
+            }
+            Field idField = getField(client.getClass(), classMetaData.getIdField().getName());
+            values.add(idField.get(client));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        dbExecutor.executeStatement(connection, entitySQLMetaData.getUpdateSql(), values);
     }
 
     private T getInstance() throws Exception {

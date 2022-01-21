@@ -51,7 +51,7 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
                 .map(field -> field.getName() + " = ?")
                 .collect(Collectors.joining(", "));
         String sql = "UPDATE " + classMetaData.getName() +
-                " SET ( " + values + " ) WHERE "
+                " SET " + values + " WHERE "
                 + classMetaData.getIdField().getName() + " = ?";
         return sql;
     }
