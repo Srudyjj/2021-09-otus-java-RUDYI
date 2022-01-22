@@ -7,7 +7,9 @@ import ru.otus.core.repository.executor.DbExecutorImpl;
 import ru.otus.core.sessionmanager.TransactionRunnerJdbc;
 import ru.otus.crm.datasource.DriverManagerDataSource;
 import ru.otus.crm.model.Client;
+import ru.otus.crm.model.Manager;
 import ru.otus.crm.service.DbServiceClientImpl;
+import ru.otus.crm.service.DbServiceManagerImpl;
 import ru.otus.jdbc.mapper.*;
 
 import javax.sql.DataSource;
@@ -40,19 +42,28 @@ public class HomeWork {
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
         log.info("clientSecondSelected:{}", clientSecondSelected);
 
+        clientSecondSelected.setName("Changed name");
+        dbServiceClient.saveClient(clientSecondSelected);
+
+        for (Client client : dbServiceClient.findAll()) {
+            log.info(client.toString());
+        }
+
+
+
 // Сделайте тоже самое с классом Manager (для него надо сделать свою таблицу)
 
-//        EntityClassMetaData entityClassMetaDataManager; // = new EntityClassMetaDataImpl();
-//        EntitySQLMetaData entitySQLMetaDataManager = null; //= new EntitySQLMetaDataImpl();
-//        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager);
-//
-//        var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);
-//        dbServiceManager.saveManager(new Manager("ManagerFirst"));
-//
-//        var managerSecond = dbServiceManager.saveManager(new Manager("ManagerSecond"));
-//        var managerSecondSelected = dbServiceManager.getManager(managerSecond.getNo())
-//                .orElseThrow(() -> new RuntimeException("Manager not found, id:" + managerSecond.getNo()));
-//        log.info("managerSecondSelected:{}", managerSecondSelected);
+        EntityClassMetaData<Manager> entityClassMetaDataManager = new EntityClassMetaDataImpl<>(Manager.class);
+        EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl(entityClassMetaDataManager);
+        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager, entityClassMetaDataManager);
+
+        var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);
+        dbServiceManager.saveManager(new Manager("ManagerFirst"));
+
+        var managerSecond = dbServiceManager.saveManager(new Manager("ManagerSecond"));
+        var managerSecondSelected = dbServiceManager.getManager(managerSecond.getNo())
+                .orElseThrow(() -> new RuntimeException("Manager not found, id:" + managerSecond.getNo()));
+        log.info("managerSecondSelected:{}", managerSecondSelected);
     }
 
     private static void flywayMigrations(DataSource dataSource) {
