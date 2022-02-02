@@ -1,12 +1,8 @@
 package ru.otus.crm.model;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "client")
@@ -20,22 +16,40 @@ public class Client implements Cloneable {
     @Column(name = "name")
     private String name;
 
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @MapsId
+    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "fk_client_address"))
+    private Address address;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @Column(nullable = false)
+    private List<Phone> phones;
+
     public Client() {
     }
 
-    public Client(String name) {
+    public Client(String name, Address address, List<Phone> phones) {
         this.id = null;
         this.name = name;
+        this.address = address;
+        phones.forEach(phone -> phone.setClient(this));
+        this.phones = phones;
+
     }
 
-    public Client(Long id, String name) {
+    public Client(Long id, String name, Address address, List<Phone> phones) {
         this.id = id;
         this.name = name;
+        this.address = address;
+        for (Phone phone : phones) {
+            phone.setClient(this);
+        }
+        this.phones = phones;
     }
 
     @Override
     public Client clone() {
-        return new Client(this.id, this.name);
+        return new Client(this.id, this.name, this.address, this.phones);
     }
 
     public Long getId() {
@@ -54,11 +68,30 @@ public class Client implements Cloneable {
         this.name = name;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    private void setPhones(List<Phone> phones) {
+        this.phones = phones;
+    }
+
     @Override
     public String toString() {
-        return "Client{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        StringBuilder sb = new StringBuilder("Client{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", address=").append(address);
+        sb.append(", phones=").append(phones);
+        sb.append('}');
+        return sb.toString();
     }
 }
