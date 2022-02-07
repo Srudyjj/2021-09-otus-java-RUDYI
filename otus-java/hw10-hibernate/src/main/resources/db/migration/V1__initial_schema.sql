@@ -21,7 +21,7 @@ create table client
 (
     id   bigint not null primary key,
     name varchar(50),
-    client add constraint fk_client_address foreign key (id) references address
+    constraint fk_client_address foreign key (id) references address
 );
 
 
