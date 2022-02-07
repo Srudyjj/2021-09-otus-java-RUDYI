@@ -11,6 +11,7 @@ dependencies {
     implementation('org.flywaydb:flyway-core')
 
     implementation("org.postgresql:postgresql")
+    implementation project(":hw11-cache:homework")
 
     testImplementation("com.h2database:h2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
