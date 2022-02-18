@@ -5,7 +5,6 @@ create table client
     id   bigserial not null primary key,
     name varchar(50)
 );
-
  */
 
 -- Для @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -32,5 +31,3 @@ create table phone
     client_id   bigint not null,
     constraint fk_phone_client foreign key (client_id) references client
 );
-
-
