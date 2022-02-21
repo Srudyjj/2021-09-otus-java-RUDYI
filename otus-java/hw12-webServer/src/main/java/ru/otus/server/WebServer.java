@@ -10,10 +10,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import ru.otus.crm.service.DBServiceClient;
 import ru.otus.helpers.FileSystemHelper;
-import ru.otus.service.UserAuthService;
 import ru.otus.service.TemplateProcessor;
+import ru.otus.service.UserAuthService;
 import ru.otus.servlet.AuthorizationFilter;
-import ru.otus.servlet.ClientApiServlet;
 import ru.otus.servlet.ClientsServlet;
 import ru.otus.servlet.LoginServlet;
 
@@ -59,7 +58,7 @@ public class WebServer {
 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(resourceHandler);
-        handlers.addHandler(applySecurity(servletContextHandler, "/clients", "/api/client/*"));
+        handlers.addHandler(applySecurity(servletContextHandler, "/clients"));
 
 
         server.setHandler(handlers);
@@ -85,7 +84,6 @@ public class WebServer {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.addServlet(new ServletHolder(new LoginServlet(templateProcessor, authService)), "/login");
         servletContextHandler.addServlet(new ServletHolder(new ClientsServlet(templateProcessor, serviceClient)), "/clients");
-        servletContextHandler.addServlet(new ServletHolder(new ClientApiServlet(serviceClient, gson)), "/api/client/*");
         return servletContextHandler;
     }
 }

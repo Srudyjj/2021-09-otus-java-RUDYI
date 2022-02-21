@@ -25,5 +25,26 @@
         </#list>
         </tbody>
     </table>
+
+    <h4>Добавить клиента</h4>
+    <br/>
+    <form action="clients" method="post">
+        <label>
+            Имя <br/>
+            <input type="text" name="name">
+        </label>
+        <br/>
+        <label>
+            Адрес<br/>
+            <input type="text" name="address">
+        </label>
+        <br/>
+        <label>
+            Телефоны (несколько через ;)<br/>
+            <input type="text" name="phones">
+        </label>
+        <br/>
+        <input type="submit" value="Добавить">
+    </form>
 </body>
 </html>
