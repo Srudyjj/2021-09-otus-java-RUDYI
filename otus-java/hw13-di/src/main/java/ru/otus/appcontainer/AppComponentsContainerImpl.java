@@ -1,9 +1,14 @@
 package ru.otus.appcontainer;
 
+import ru.otus.appcontainer.api.AppComponent;
 import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.appcontainer.api.AppComponentsContainerConfig;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AppComponentsContainerImpl implements AppComponentsContainer {
 
@@ -11,13 +16,51 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     private final Map<String, Object> appComponentsByName = new HashMap<>();
 
     public AppComponentsContainerImpl(Class<?> initialConfigClass) {
-        processConfig(initialConfigClass);
+        try {
+            processConfig(initialConfigClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void processConfig(Class<?> configClass) {
+    private void processConfig(Class<?> configClass) throws Exception {
         checkConfigClass(configClass);
-        // You code here...
+        Object configInst = configClass.getConstructor().newInstance();
+//        Method[] methods = configClass.getDeclaredMethods();
+//        for (Method method : methods) {
+//            if (method.isAnnotationPresent(AppComponent.class)) {
+//                AppComponent annotation = method.getAnnotation(AppComponent.class);
+//                System.out.println(annotation.order());
+//                System.out.println(annotation.name());
+//                for (Class<?> arg : method.getParameterTypes()) {
+//                    System.out.println(arg.getName());
+//                }
+//            }
+//        }
+
+        for (Method method : getMethods(configClass)){
+            Object bean;
+            if (method.getParameterCount() > 0) {
+                Object[] params = Stream.of(method.getParameterTypes())
+                        .map(p -> Optional.ofNullable(getAppComponent(p))
+                                .orElseThrow(() -> new RuntimeException("Can't find bean " + p.getName())))
+                        .toArray();
+                bean = method.invoke(configInst, params);
+            } else {
+                bean = method.invoke(configInst);
+            }
+            appComponents.add(bean);
+            appComponentsByName.put(method.getName(), bean);
+        }
     }
+
+    private List<Method> getMethods(Class<?> configClass) {
+        return Stream.of(configClass.getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(AppComponent.class))
+                .sorted(Comparator.comparingInt(m -> m.getAnnotation(AppComponent.class).order()))
+                .toList();
+    }
+
 
     private void checkConfigClass(Class<?> configClass) {
         if (!configClass.isAnnotationPresent(AppComponentsContainerConfig.class)) {
@@ -27,6 +70,11 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     @Override
     public <C> C getAppComponent(Class<C> componentClass) {
+        for (Object bean : appComponents) {
+            if (bean.getClass().getName().equalsIgnoreCase(componentClass.getName())) {
+                return (C) bean;
+            }
+        }
         return null;
     }
 
