@@ -26,17 +26,6 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     private void processConfig(Class<?> configClass) throws Exception {
         checkConfigClass(configClass);
         Object configInst = configClass.getConstructor().newInstance();
-//        Method[] methods = configClass.getDeclaredMethods();
-//        for (Method method : methods) {
-//            if (method.isAnnotationPresent(AppComponent.class)) {
-//                AppComponent annotation = method.getAnnotation(AppComponent.class);
-//                System.out.println(annotation.order());
-//                System.out.println(annotation.name());
-//                for (Class<?> arg : method.getParameterTypes()) {
-//                    System.out.println(arg.getName());
-//                }
-//            }
-//        }
 
         for (Method method : getMethods(configClass)){
             Object bean;
@@ -71,15 +60,28 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     @Override
     public <C> C getAppComponent(Class<C> componentClass) {
         for (Object bean : appComponents) {
-            if (bean.getClass().getName().equalsIgnoreCase(componentClass.getName())) {
+            if (bean.getClass().getName().equalsIgnoreCase(componentClass.getName())
+            || compareToInterface(bean.getClass(), componentClass)) {
                 return (C) bean;
             }
         }
         return null;
     }
 
+    private static boolean compareToInterface(Class<?> beanClass, Class<?> foundClass) {
+        for (Class<?> anInterface : beanClass.getInterfaces()) {
+            if (anInterface.getName().equalsIgnoreCase(foundClass.getName())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public <C> C getAppComponent(String componentName) {
+        if (appComponentsByName.containsKey(componentName)) {
+            return (C) appComponentsByName.get(componentName);
+        }
         return null;
     }
 }
