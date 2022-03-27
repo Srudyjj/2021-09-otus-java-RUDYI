@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <title>Клиенты</title>
+</head>
+<body>
+    <h4>Клиенты</h4>
+    <table style="width: 400px">
+        <thead>
+        <tr>
+            <td style="width: 50px">Id</td>
+            <td style="width: 150px">Имя</td>
+            <td style="width: 100px">Адрес</td>
+            <td style="width: 100px">Телефоны</td>
+        </tr>
+        </thead>
+        <tbody>
+        <#list clients as client>
+            <tr>
+                <td>${client.id}</td>
+                <td>${client.name}</td>
+                <td>${client.address}</td>
+                <td>${client.phones}</td>
+            </tr>
+        </#list>
+        </tbody>
+    </table>
+
+    <h4>Добавить клиента</h4>
+    <br/>
+    <form action="clients" method="post">
+        <label>
+            Имя <br/>
+            <input type="text" name="name">
+        </label>
+        <br/>
+        <label>
+            Адрес<br/>
+            <input type="text" name="address">
+        </label>
+        <br/>
+        <label>
+            Телефоны (несколько через ;)<br/>
+            <input type="text" name="phones">
+        </label>
+        <br/>
+        <input type="submit" value="Добавить">
+    </form>
+</body>
+</html>
