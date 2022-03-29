@@ -8,39 +8,40 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private int count = 1;
     private int i = 1;
-    private int last = 1;
+    private boolean skip = true;
 
-    public static void main(String[] args) {
-        log.info("Hello");
+    public static void main(String[] args) throws Exception {
         var main = new Main();
-        new Thread(main::count).start();
-        new Thread(main::count).start();
+        var t1 = new Thread(main::count);
+        var t2 = new Thread(main::count);
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
     }
 
     private synchronized void count() {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                while(i < 20) {
-                    log.info(Thread.currentThread().getName() + ":" + count);
+        try {
+            while (i < 20 && !Thread.currentThread().isInterrupted()) {
+                sleep();
+                log.info(Thread.currentThread().getName() + ":" + count);
 
-                    while (last == count) {
-                        wait();
-                    }
-
-                    if (i < 10) {
-                        count++;
-                    } else {
-                        count--;
-                    }
-                    i++;
-                    last = count;
-                    sleep();
-                    notifyAll();
+                if (skip) {
+                    skip = false;
+                    continue;
+                } else if (i < 10) {
+                    count++;
+                } else {
+                    count--;
                 }
-            } catch (InterruptedException ex) {
-                log.error(ex.getMessage());
-                Thread.currentThread().interrupt();
+                i++;
+                skip = true;
+                notify();
+                wait();
             }
+        } catch (InterruptedException ex) {
+            log.error(ex.getMessage());
+            Thread.currentThread().interrupt();
         }
     }
 
