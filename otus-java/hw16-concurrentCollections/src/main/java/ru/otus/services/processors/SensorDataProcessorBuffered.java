@@ -6,8 +6,11 @@ import ru.otus.lib.SensorDataBufferedWriter;
 import ru.otus.api.SensorDataProcessor;
 import ru.otus.api.model.SensorData;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 // Этот класс нужно реализовать
 public class SensorDataProcessorBuffered implements SensorDataProcessor {
@@ -16,29 +19,32 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
 
-    private final TreeSet<SensorData> dataBuffer;
+    private final PriorityBlockingQueue<SensorData> dataBuffer;
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
         this.writer = writer;
-        this.dataBuffer = new TreeSet<>(Comparator.comparing(SensorData::getMeasurementTime));
+        this.dataBuffer =
+                new PriorityBlockingQueue<>(
+                        bufferSize,
+                        Comparator.comparing(SensorData::getMeasurementTime));
     }
 
     @Override
     public void process(SensorData data) {
+        dataBuffer.put(data);
         if (dataBuffer.size() >= bufferSize) {
             flush();
         }
-
-        dataBuffer.add(data);
-
     }
 
-    public void flush() {
+    public synchronized void flush() {
         try {
-            var bufferedData = dataBuffer.stream().toList();
-            bufferedData.forEach(dataBuffer::remove);
-            writer.writeBufferedData(bufferedData);
+            if (!dataBuffer.isEmpty()) {
+                List<SensorData> bufferedData = new ArrayList<>(bufferSize);
+                dataBuffer.drainTo(bufferedData);
+                writer.writeBufferedData(bufferedData);
+            }
         } catch (Exception e) {
             log.error("Ошибка в процессе записи буфера", e);
         }
