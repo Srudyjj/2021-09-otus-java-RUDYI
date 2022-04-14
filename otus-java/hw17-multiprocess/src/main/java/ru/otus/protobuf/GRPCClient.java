@@ -3,6 +3,7 @@ package ru.otus.protobuf;
 import io.grpc.ManagedChannelBuilder;
 import ru.otus.protobuf.generated.Request;
 import ru.otus.protobuf.generated.ServerServiceGrpc;
+import ru.otus.protobuf.service.GeneratorClient;
 
 public class GRPCClient {
 
@@ -21,8 +22,21 @@ public class GRPCClient {
                 .build();
         var generatedValue = stub.generateValues(request);
 
-        generatedValue.forEachRemaining(response -> {
-            System.out.println(response.getServerValue());
-        });
+        var generator = new GeneratorClient(generatedValue);
+        generator.start();
+        var i = 0;
+        while (i <= 50) {
+            int generatorCurrentValue = generator.getCurrentValue();
+            System.out.println("Generator value -> " + generatorCurrentValue);
+            System.out.println("Value -> " + (i + generatorCurrentValue + 1));
+
+            i++;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }
