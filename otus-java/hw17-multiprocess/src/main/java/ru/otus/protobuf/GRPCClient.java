@@ -1,11 +1,15 @@
 package ru.otus.protobuf;
 
 import io.grpc.ManagedChannelBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.otus.protobuf.generated.Request;
 import ru.otus.protobuf.generated.ServerServiceGrpc;
 import ru.otus.protobuf.service.GeneratorClient;
 
 public class GRPCClient {
+
+    private static final Logger log = LoggerFactory.getLogger(GRPCClient.class);
 
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8190;
@@ -26,9 +30,11 @@ public class GRPCClient {
         generator.start();
         var i = 0;
         while (i <= 50) {
-            int generatorCurrentValue = generator.getCurrentValue();
-            System.out.println("Generator value -> " + generatorCurrentValue);
-            System.out.println("Value -> " + (i + generatorCurrentValue + 1));
+            int generatorCurrentValue =
+                    generator.getCurrentValue();
+            log.info("new value:{}", generatorCurrentValue);
+            int currentValue = i + generatorCurrentValue + 1;
+            log.info("currentValue:{}", currentValue);
 
             i++;
             try {
